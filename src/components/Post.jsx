@@ -1,10 +1,9 @@
 import { format,formatDistanceToNow } from  'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { useState } from 'react';
-
-import { Avatar } from './Avatar';
 import { Comment } from './Comment';
 import styles from './Post.module.css';
+import { Avatar } from './Avatar';
 
 export function Post ({author ,publishedAt,content}) {
   //Estado que armazena e avisa para o React 
@@ -34,13 +33,24 @@ export function Post ({author ,publishedAt,content}) {
     }
   //Função para armazenar em um estado o valor do textarea
   function handleNewCommentChange() {
+    event.target.setCustomValidity('');
     setNewCommentText(event.target.value);
+  }
+
+  function handleNewCommentInvalid() {
+    event.target.setCustomValidity('Esse campo é obrigatório!');
   }
   // Função que vai ser passada para o component filho para que possa
   //deletar algum comentário
-  function onDeleteComment(comment) {
-    console.log('Deletar comentário');
+  function onDeleteComment(commentToDelete) {
+    const commentsWithoutDeletedOne= comments.filter(
+      comment=> {
+        return comment !== commentToDelete;
+      }
+    )
+    setComments(commentsWithoutDeletedOne);
   }
+  const isNewCommentEmpety = newCommentText.length=== 0
 
   return (
     <article className={styles.post}>
@@ -75,9 +85,12 @@ export function Post ({author ,publishedAt,content}) {
           value={newCommentText}
           placeholder='Deixe um comentário'
           onChange={handleNewCommentChange}
+          onInvalid={handleNewCommentInvalid}
+          required
         />
       <footer>
-        <button 
+        <button
+        disabled={isNewCommentEmpety}
         type="submit"
         >
         Publicar  
@@ -102,3 +115,4 @@ export function Post ({author ,publishedAt,content}) {
     </article>
   );
 }
+
